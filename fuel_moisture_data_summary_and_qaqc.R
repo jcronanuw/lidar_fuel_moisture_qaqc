@@ -16,6 +16,9 @@
 #prduces graphics, summary stats, and runs QAQC checks on the data.
 #Data resides on a University of Washington shared Google Drive.
 
+###############################################################################################################################
+###############################################################################################################################
+###############################################################################################################################
 #Libraries
 library(tidyverse)
 library(readxl)
@@ -26,24 +29,24 @@ drive_auth()
 1#jcronan@uw.edu
 
 #Set working drive
-setwd("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/")
+setwd("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/")
 
 
 #Fuel Moisture Weights
 #Copy link to file into an object
-target <- drive_get("https://docs.google.com/spreadsheets/d/10ngLwl_c3fGdmkDzLAC_SAu_uCZLx7QT/edit#gid=493287309", 
+target <- drive_get("https://docs.google.com/spreadsheets/d/1PFLwhnQT0MWADytQnyVDfg7utLOEv0DiczoX4micFGQ/edit#gid=1004095978", 
                     team_drive = "2021 Lidar fuel moisture")
 
 #Download a copy of the fuel moisture file
 drive_download(target, 
                type = "xlsx", 
-               path = "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/Fuel_moisture_weights.xlsx", 
+               path = "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/Fuel_moisture_weights.xlsx", 
                overwrite = T)
 
 #load data
-weights <- read_excel("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/Fuel_moisture_weights.xlsx")
-weights <- write_csv(weights, "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/Fuel_moisture_weights.csv")
-weights <- read.csv("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/Fuel_moisture_weights.csv")
+weights <- read_excel("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/Fuel_moisture_weights.xlsx")
+weights <- write_csv(weights, "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/Fuel_moisture_weights.csv")
+weights <- read.csv("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/Fuel_moisture_weights.csv")
 
 #Tray Weights
 #Copy link to file into an object
@@ -53,13 +56,13 @@ target <- drive_get("https://docs.google.com/spreadsheets/d/1qsmEyXoUtkw29mrA6s1
 #Download a copy of the fuel moisture file
 drive_download(target, 
                type = "xlsx", 
-               path = "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/drying_trays.xlsx", 
+               path = "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/drying_trays.xlsx", 
                overwrite = T)
 
 #load data
-tare <- read_excel("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/drying_trays.xlsx")
-tare <- write_csv(tare, "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/drying_trays.csv")
-tare <- read.csv("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/drying_trays.csv")
+tare <- read_excel("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/drying_trays.xlsx")
+tare <- write_csv(tare, "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/drying_trays.csv")
+tare <- read.csv("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/drying_trays.csv")
 
 #Dry Weights
 #Copy link to file into an object
@@ -69,15 +72,17 @@ target <- drive_get("https://docs.google.com/spreadsheets/d/1QJgsKv3ArD5V7lIuMS7
 #Download a copy of the fuel moisture file
 drive_download(target, 
                type = "xlsx", 
-               path = "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/dry_weights.xlsx", 
+               path = "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/dry_weights.xlsx", 
                overwrite = T)
 
 #load data
-dry.wts <- read_excel("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/dry_weights.xlsx")
-dry.wts <- write_csv(dry.wts, "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/dry_weights.csv")
-dry.wts <- read.csv("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_temp/GoogleDrive_TempDownloads/dry_weights.csv")
+dry.wts <- read_excel("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/dry_weights.xlsx")
+dry.wts <- write_csv(dry.wts, "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/dry_weights.csv")
+dry.wts <- read.csv("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/dry_weights.csv")
 
-############ Pine boards
+###############################################################################################################################
+#################################################     PINE BOARDS          ####################################################
+###############################################################################################################################
 weights.pb <- filter(weights, sample.type=="PB")
 
 #dry.p <- dry.wts %>%
@@ -87,7 +92,7 @@ weights.pb <- filter(weights, sample.type=="PB")
 
 #adds dry weights from earliest set of oven dry scans
 dry.p <- weights.pb %>%
-  filter(scan=="OD" & time == "1104") %>%
+  filter(scan=="od" & time == 1104) %>%
   select(Sample, gross.weight) %>%
   mutate(dry.wt = gross.weight) %>%
   select(Sample, dry.wt)
@@ -117,7 +122,29 @@ PB <- ggplot(data=pb.fm, aes(x=scan.pb, y=fm))+
   xlab("Scan time (hour)")
 PB 
 
-######## Cheese cloth
+##########################################
+#What kind of errors can I look for in this data?
+#1 - plot out changes in weight and fuel moisture for each sample.
+#Seperate out by location to see if individual scales are having an impact.
+#Manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
+#Run review for gross weight and fuel moisture.
+
+sn <- 16
+data <- pb.fm[pb.fm$Sample == sn,]
+data.pb <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data$location <- as.factor(data$location)
+
+# Plot
+#"fm" | "gross.weight"
+sp <- data %>%
+  ggplot(aes(data.pb, fm, color = location)) +
+  geom_point(aes(fill=data.pb),size=3) +
+  geom_line(aes(group = location),color="black")
+sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+###############################################################################################################################
+#################################################     CHEESE CLOTH         ####################################################
+###############################################################################################################################
 weights.cc <- weights %>%
   filter(sample.type == "CC") 
 
@@ -137,7 +164,7 @@ weights.cc$net.wt <- weights.cc$gross.weight - weights.cc$tare.staple
 
 #adds dry weights from earliest set of oven dry scans
 dry.cc <- weights.cc %>%
-  filter(scan=="OD" & time == "842") %>%
+  filter(scan=="od" & time == "842") %>%
   select(Sample, net.wt) %>%
   mutate(dry.wt = net.wt) %>%
   select(Sample, dry.wt)
@@ -167,11 +194,33 @@ CC <- ggplot(data=cc.fm, aes(x=scan.c, y=fm))+
 
 CC 
 
-##############DF
+##########################################
+#What kind of errors can I look for in this data?
+#1 - plot out changes in weight and fuel moisture for each sample.
+#Seperate out by location to see if individual scales are having an impact.
+#manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
+#Run review for gross weight and fuel moisture.
+
+sn <- 16
+data <- cc.fm[cc.fm$Sample == sn,]
+data.cc <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data$location <- as.factor(data$location)
+
+# Plot
+#"fm" | "gross.weight"
+sp <- data %>%
+  ggplot(aes(data.cc, gross.weight, color = location)) +
+  geom_point(aes(fill=data.cc),size=3) +
+  geom_line(aes(group = location),color="black")
+sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+###############################################################################################################################
+#################################################     DOUGLAS-FIR          ####################################################
+###############################################################################################################################
 weights.df <- filter(weights, sample.type == "DF")
 
 tare.df <- tare %>%
-  filter (tare.wt > 0 & Sample < 16) %>%
+  filter (tare.wt > 0 & Sample < 17) %>%
   select (Sample, tare.wt)
 
 weights.df <- inner_join(weights.df, tare.df, by = "Sample")
@@ -187,7 +236,7 @@ weights.df$net.wt <- weights.df$gross.weight-weights.df$tare.wt
 
 #adds dry weights from earliest set of oven dry scans
 dry.df <- weights.df %>%
-  filter(scan=="OD" & time == "1015") %>%
+  filter(scan=="od" & time == "1015") %>%
   select(Sample, gross.weight, tare.wt)%>%
   mutate(dry.wt = gross.weight - tare.wt) %>%
   select(Sample, dry.wt)
@@ -209,7 +258,7 @@ df.fm2 <- df.fm %>%
   select(name2, fm)
 
 sample.d <- df.fm$Sample
-scan.d <- factor(df.fm$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+scan.d <- factor(df.fm$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 
 DF <- ggplot(data=df.fm, aes(x=scan.d, y=fm))+
   geom_point(color = sample.d, size=3)+
@@ -220,7 +269,29 @@ DF <- ggplot(data=df.fm, aes(x=scan.d, y=fm))+
 
 DF
 
-#######PP
+##########################################
+#What kind of errors can I look for in this data?
+#1 - plot out changes in weight and fuel moisture for each sample.
+#Seperate out by location to see if individual scales are having an impact.
+#Manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
+#Run review for gross weight and fuel moisture.
+
+sn <- 16
+data <- df.fm[df.fm$Sample == sn,]
+data.df <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data$location <- as.factor(data$location)
+
+# Plot
+#"fm" | "gross.weight"
+sp <- data %>%
+  ggplot(aes(data.df, gross.weight, color = location)) +
+  geom_point(aes(fill=data.df),size=3) +
+  geom_line(aes(group = location),color="black")
+sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+###############################################################################################################################
+#################################################     PONDEROSA PINE       ####################################################
+###############################################################################################################################
 weights.pp <- filter(weights, sample.type == "PP")
 
 weights.pp <- inner_join(weights.pp, tare, by = "Sample")
@@ -230,7 +301,7 @@ weights.pp$net.wt <- weights.pp$gross.weight-weights.pp$tare.wt
 
 #adds dry weights from earliest set of oven dry scans
 dry.pp <- weights.pp %>%
-  filter(scan=="OD" & time == "841") %>%
+  filter(scan=="od" & time == "841") %>%
   select(Sample, gross.weight, tare.wt)%>%
   mutate(dry.wt = gross.weight - tare.wt) %>%
   select(Sample, dry.wt)
@@ -261,7 +332,29 @@ PP <- ggplot(data=pp.fm, aes(x=scan.p, y=fm))+
 
 PP
 
-#######SRO
+##########################################
+#What kind of errors can I look for in this data?
+#1 - plot out changes in weight and fuel moisture for each sample.
+#Seperate out by location to see if individual scales are having an impact.
+#Manually enter each of the sample numbers, 17-32, and review graphs. Lines should be mostly parallel
+#Run review for gross weight and fuel moisture.
+
+sn <- 32
+data <- pp.fm[pp.fm$Sample == sn,]
+data.pp <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data$location <- as.factor(data$location)
+
+# Plot
+#"fm" | "gross.weight"
+sp <- data %>%
+  ggplot(aes(data.pp, fm, color = location)) +
+  geom_point(aes(fill=data.pp),size=3) +
+  geom_line(aes(group = location),color="black")
+sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+###############################################################################################################################
+#################################################     SOUTHERN RED OAK    #####################################################
+###############################################################################################################################
 weights.sro <- filter(weights, sample.type == "SRO")
 
 tare.sro <- tare %>%
@@ -275,7 +368,7 @@ weights.sro$net.wt <- weights.sro$gross.weight-weights.sro$tare.wt
 
 #adds dry weights from first set of oven dry scans
 dry.sro <- weights.sro %>%
-  filter(scan=="OD" & time == "1014") %>%
+  filter(scan=="od" & time == "1014") %>%
   select(Sample, gross.weight, tare.wt2)%>%
   mutate(dry.wt = gross.weight - tare.wt2) %>%
   select(Sample, dry.wt)
@@ -295,7 +388,7 @@ sro.fm2 <- sro.fm %>%
   select(name2, fm)
 
 sample.s <- sro.fm$Sample
-scan.s <- factor(sro.fm$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+scan.s <- factor(sro.fm$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 
 SRO <- ggplot(data=sro.fm, aes(x=scan.s, y=fm))+
   geom_point(color = sample.s, size=3)+
@@ -306,14 +399,36 @@ SRO <- ggplot(data=sro.fm, aes(x=scan.s, y=fm))+
 
 SRO
 
-#######LLP
+##########################################
+#What kind of errors can I look for in this data?
+#1 - plot out changes in weight and fuel moisture for each sample.
+#Seperate out by location to see if individual scales are having an impact.
+#Manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
+#Run review for gross weight and fuel moisture.
+
+sn <- 6
+data <- sro.fm[sro.fm$Sample == sn,]
+data.sro <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
+data$location <- as.factor(data$location)
+
+# Plot
+#"fm" | "gross.weight"
+sp <- data %>%
+  ggplot(aes(data.sro, fm, color = location)) +
+  geom_point(aes(fill=data.sro),size=3) +
+  geom_line(aes(group = location),color="black")
+sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+###############################################################################################################################
+#################################################     LONGLEAF PINE    ########################################################
+###############################################################################################################################
 weights.llp <- filter(weights, sample.type == "LLP")
 
 weights.llp <- inner_join(weights.llp, tare, by = "Sample")
 
 #adds dry weights from first set of oven dry scans
 dry.llp <- weights.llp %>%
-  filter(scan=="OD" & time == "1026") %>%
+  filter(scan=="od" & time == "1026") %>%
   select(Sample, gross.weight, tare.wt)%>%
   mutate(dry.wt = gross.weight - tare.wt) %>%
   select(Sample, dry.wt)
@@ -336,7 +451,7 @@ llp.fm2 <- llp.fm %>%
 
 
 sample.l <- llp.fm$Sample
-scan.l <- factor(weights.llp$scan, ordered = T, levels = c("0", "1", "2", "4", "8", "12", "24", "36", "48", "72", "120", "OD"))
+scan.l <- factor(weights.llp$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 
 LLP <- ggplot(data=llp.fm, aes(x=scan.l, y=fm))+
   geom_point(color = sample.l, size=3)+
@@ -346,6 +461,30 @@ LLP <- ggplot(data=llp.fm, aes(x=scan.l, y=fm))+
   xlab("Scan time (hours)")
 
 LLP
+
+##########################################
+#What kind of errors can I look for in this data?
+#1 - plot out changes in weight and fuel moisture for each sample.
+#Seperate out by location to see if individual scales are having an impact.
+#Manually enter each of the sample numbers, 17-32, and review graphs. Lines should be mostly parallel
+#Run review for gross weight and fuel moisture.
+
+sn <- 32
+data <- llp.fm[llp.fm$Sample == sn,]
+data.llp <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data$location <- as.factor(data$location)
+
+# Plot
+#"fm" | "gross.weight"
+sp <- data %>%
+  ggplot(aes(data.llp, fm, color = location)) +
+  geom_point(aes(fill=data.llp),size=3) +
+  geom_line(aes(group = location),color="black")
+sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+llp.fm[llp.fm$scan == "48.0",]
+str(data)
+
 
 ############
 #create df of all sample names and fuel moistures
@@ -358,5 +497,125 @@ library("gridExtra")
 all <- grid.arrange (PB, CC, DF, PP, SRO, LLP, nrow = 3)
 
 ggsave(all, filename = "G:/Shared drives/2021 Lidar fuel moisture/Data_results/FM.Plots.pdf", device = "pdf", width = 7.7, height = 8, dpi = 300)
+
+###################################################################################################################################################
+###################################################################################################################################################
+###################################################################################################################################################
+#QAQC - flag gross weight outliers among scan positions (3m , 6m, 9m, and 12m) for each sample at each scan time.
+
+#Calculate standard deviation, number of samples, minimum value, and max value for gross weights by sample type, sample number, and
+#scan time.
+sstats.1 <- as.data.frame(weights %>%
+  group_by(sample.type, Sample, scan) %>%
+  summarise(sd = round(sd(gross.weight),2), n = n(), min = min(gross.weight), max = max(gross.weight)))
+
+#Calculate range between min and max values for gross weight.
+diff.1 <- sstats.1$max - sstats.1$min
+
+#Combine with earlier object.
+sstats.2 <- data.frame(sstats.1, data.range = diff.1)
+
+#Breaks for histogram
+bs <- seq(0,65,1)
+
+#Do a histogram to see how gross weight spread 
+nf <- layout(matrix(c(1,2,3,4,5,6),3,2,byrow = TRUE), c(1,1,1), c(1,1), TRUE)
+layout.show(nf)
+hist(sstats.2$data.range[sstats.2$sample.type == "PB"], breaks = bs, main = "Pine Board")
+hist(sstats.2$data.range[sstats.2$sample.type == "CC"], breaks = bs, main = "Cheese Cloth")
+hist(sstats.2$data.range[sstats.2$sample.type == "DF"], breaks = bs, main = "Douglas-fir")
+hist(sstats.2$data.range[sstats.2$sample.type == "PP"], breaks = bs, main = "Ponderosa Pine")
+hist(sstats.2$data.range[sstats.2$sample.type == "SRO"], breaks = bs, main = "Southern Red Oak")
+hist(sstats.2$data.range[sstats.2$sample.type == "LLP"], breaks = bs, main = "Longleaf Pine")
+
+sstats_noZero <- sstats.2[sstats.2$scan != "0",]
+
+#Do a histogram to see how gross weight spread 
+nf <- layout(matrix(c(1,2,3,4,5,6),3,2,byrow = TRUE), c(1,1,1), c(1,1), TRUE)
+layout.show(nf)
+hist(sstats_noZero$data.range[sstats_noZero$sample.type == "PB"], breaks = bs, main = "Pine Board")
+hist(sstats_noZero$data.range[sstats_noZero$sample.type == "CC"], breaks = bs, main = "Cheese Cloth")
+hist(sstats_noZero$data.range[sstats_noZero$sample.type == "DF"], breaks = bs, main = "Douglas-fir")
+hist(sstats_noZero$data.range[sstats_noZero$sample.type == "PP"], breaks = bs, main = "Ponderosa Pine")
+hist(sstats_noZero$data.range[sstats_noZero$sample.type == "SRO"], breaks = bs, main = "Southern Red Oak")
+hist(sstats_noZero$data.range[sstats_noZero$sample.type == "LLP"], breaks = bs, main = "Longleaf Pine")
+
+
+#How many samples exceed a gram difference
+yellow.flags <- sstats.2[sstats.2$data.range > 2,]
+
+#How many samples have yellow flags
+length(yellow.flags[,1])
+
+#Percent of samples with yellow flags
+length(yellow.flags[,1])/length(sstats.2[,1])
+
+#Samples for the zero hour scan can reasonably be expected to have different weights over the four scan locations because
+#water was dripping from sample trays. Remove them
+#How many samples exceed a gram difference
+blue.flags <- sstats_noZero[sstats_noZero$data.range > 5,]
+
+#How many samples have yellow flags
+length(blue.flags[,1])
+
+#Percent of samples with yellow flags
+length(blue.flags[,1])/length(sstats.2[,1])
+
+#Worst offenders: samples after 0-hr scan with range of weights exceeding 10 grams
+red.flags <- sstats_noZero[sstats_noZero$data.range > 10,]
+
+#How many samples have yellow flags
+length(red.flags[,1])
+
+#Percent of samples with yellow flags
+length(red.flags[,1])/length(sstats.2[,1])
+#3.3% of samples are in this category
+
+#Start reviewing them
+red.flags
+
+setwd("C:/Users/jcronan/Box/FERA-UW/Research/3DFuels/Lidar_Fuel_Moisture/QAQC_Fuel_Moisture")
+write.csv(red.flags, file = "red_flags.csv")
+write.csv(sstats.2, file = "fuel_moisture_sample_group_qaqc.csv")
+
+###################################################################################################################################################
+###################################################################################################################################################
+###################################################################################################################################################
+#Error checking
+#Diagnose and fix errors in red flags object
+
+##### 1
+#Biggest source of errors is LLP 12-hr scan.
+
+#First, sample 29 has 3 samples for the 12 hour scan and 5 samples in the 8-hr scan. Highly likely one of the 8hrs
+#was mislabeled and should be a 12-hr sample.
+weights.llp[weights.llp$Sample == 29 & weights.llp$scan %in% c(8,12),]
+#Yep, there are two sample 29s in the 8-hr scan at the 3 hr position.
+#Based on record time and weight the sample with weight 635.82 should be in the 12-hr scan group.
+weights.llp$scan[561] <- "12"
+
+weights.12 <- weights.llp[weights.llp$scan == "12",]
+
+#Okay, now that's fixed let's figure out all the samples that are outliers.
+er <- 2#error range in grams
+
+sstats.llp <- as.data.frame(weights.12 %>%
+                            group_by(Sample) %>%
+                            summarise(median = round(median(gross.weight),2)))
+
+llp.median <- expand.grid(location = c(3,6,9,12), median = sstats.llp$median)
+diff.12 <- weights.12$gross.weight - llp.median$median
+error.12 <- weights.12[diff.12 > er,]
+error.12 <- data.frame(error.12, dev = diff.12[diff.12 > er])
+
+os.1 <- sstats.llp[order(sstats.llp$median),]
+oe.1 <- error.12[order(error.12$gross.weight),]
+
+matches <- list()
+for(i in 1:length(oe.1$date))
+{
+  matches[[i]] <- os.1[os.1$median >= (oe.1$gross.weight[i] - er) & os.1$median <= (oe.1$gross.weight[i] + er),]
+}
+
 
 
