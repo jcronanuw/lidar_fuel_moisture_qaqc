@@ -34,7 +34,7 @@ setwd("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_Te
 
 #Fuel Moisture Weights
 #Copy link to file into an object
-target <- drive_get("https://docs.google.com/spreadsheets/d/1PFLwhnQT0MWADytQnyVDfg7utLOEv0DiczoX4micFGQ/edit#gid=1004095978", 
+target <- drive_get("https://docs.google.com/spreadsheets/d/1mnouEvWTbH8AFeanQcH9e4qmcAJymQlKN-qYy5LQRVU/edit#gid=1007445331", 
                     team_drive = "2021 Lidar fuel moisture")
 
 #Download a copy of the fuel moisture file
@@ -129,9 +129,9 @@ PB
 #Manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 16
+sn <- 1
 data <- pb.fm[pb.fm$Sample == sn,]
-data.pb <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data.pb <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
 
 # Plot
@@ -141,6 +141,44 @@ sp <- data %>%
   geom_point(aes(fill=data.pb),size=3) +
   geom_line(aes(group = location),color="black")
 sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+#Lines connected weights at locations should be parallel. If they are not samples were weighed out of order or there
+#was an error.
+
+#Flags
+#Sample 2 - sample weights do not fall into expected order for the 6-m location with the 0-hr and 4-hr scan.
+data[data$scan == "0.0",]
+data[data$scan == "4.0",]
+
+#Flags
+#Sample 6 - sample weights do not fall into expected order for the 6-m location with the 0-hr and 2-hr scan.
+x1 <- data[data$scan == "0.0",]
+x2 <- data[data$scan == "2.0",]
+x3 <- data[data$scan == "4.0",]
+x4 <- data[data$scan == "8.0",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+x4[order(x4$time),]
+
+#Flags
+#Sample 8 - sample weights do not fall into expected order for the 9-m location with the 0-hr scan.
+x1 <- data[data$scan == "0.0",]
+x2 <- data[data$scan == "2.0",]
+x3 <- data[data$scan == "4.0",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Flags
+#Sample 8 - sample weights are outside of the expected range for the 12-m location with the 120-hr scan.
+x1 <- data[data$scan == "48.0",]
+x2 <- data[data$scan == "72.0",]
+x3 <- data[data$scan == "120.0",]
+x4 <- data[data$scan == "od",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+x4[order(x4$time),]
 
 ###############################################################################################################################
 #################################################     CHEESE CLOTH         ####################################################
@@ -201,18 +239,68 @@ CC
 #manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 16
+sn <- 10
 data <- cc.fm[cc.fm$Sample == sn,]
-data.cc <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data.cc <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
 
 # Plot
 #"fm" | "gross.weight"
 sp <- data %>%
-  ggplot(aes(data.cc, gross.weight, color = location)) +
+  ggplot(aes(data.cc, fm, color = location)) +
   geom_point(aes(fill=data.cc),size=3) +
   geom_line(aes(group = location),color="black")
 sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+#Sample 3
+#Flags
+#Details - sample weights do not fall into expected order for the 8-hr scan.
+#The weight for the 12-meter location is less than would be expected and is probably incorrect.
+x1 <- data[data$scan == "4.0",]
+x2 <- data[data$scan == "8.0",]
+x3 <- data[data$scan == "12.0",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Sample 7
+#Flags
+#Details - sample weights do not fall into expected order for the 4-hr scan.
+#The weight for the 3-meter location is greater than would be expected and is probably incorrect.
+x1 <- data[data$scan == "2.0",]
+x2 <- data[data$scan == "4.0",]
+x3 <- data[data$scan == "8.0",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Sample 10
+#Flags
+#Details - sample weights do not fall into expected order for the 2-hr scan.
+#The weight for the 6-meter location is far greater than would be expected and is probably incorrect.
+x1 <- data[data$scan == "0.0",]
+x2 <- data[data$scan == "2.0",]
+x3 <- data[data$scan == "4.0",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Sample 10
+#Flags
+#Details - sample weights and fuel moistures are higher than expected range for the 24-hr, 36-hr, 
+#and 48-hr scans.
+#The weight for the 6-meter location is far greater than would be expected and is probably incorrect.
+x1 <- data[data$scan == "12.0",]
+x2 <- data[data$scan == "24.0",]
+x3 <- data[data$scan == "36.0",]
+x4 <- data[data$scan == "48.0",]
+x5 <- data[data$scan == "od",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+x4[order(x4$time),]
+x5[order(x5$time),]
+
 
 ###############################################################################################################################
 #################################################     DOUGLAS-FIR          ####################################################
@@ -276,18 +364,62 @@ DF
 #Manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 16
+sn <- 7
 data <- df.fm[df.fm$Sample == sn,]
-data.df <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data.df <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
 
 # Plot
 #"fm" | "gross.weight"
 sp <- data %>%
-  ggplot(aes(data.df, gross.weight, color = location)) +
+  ggplot(aes(data.df, fm, color = location)) +
   geom_point(aes(fill=data.df),size=3) +
   geom_line(aes(group = location),color="black")
 sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+#Sample 1
+#Flags
+#Details - the 3m location for the oven-dry scan has a fuel moisture that is higher than expected.
+x1 <- data[data$scan == "48.0",]
+x2 <- data[data$scan == "od",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+
+#Sample 2
+#Flags
+#Details - the 12m location for the 2-hr scan was outside of the expected range.
+x1 <- data[data$scan == "1.0",]
+x2 <- data[data$scan == "2.0",]
+x3 <- data[data$scan == "4.0",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Sample 5
+#Flags
+#Details - the 3m location for the 48-hr scan has a gross weight/fuel moisture that is lower than expected.
+x1 <- data[data$scan == "36.0",]
+x2 <- data[data$scan == "48.0",]
+x3 <- data[data$scan == "od",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+
+#Sample 7
+#Flags
+#Details - the 3m location for the oven-dry scan has a gross weight/fuel moisture that is higher than expected.
+x1 <- data[data$scan == "48.0",]
+x2 <- data[data$scan == "od",]
+x1[order(x1$time),]
+x2[order(x2$time),]
+
+#Sample 7
+#Flags
+#Details - the 3m location for the oven-dry scan has a gross weight/fuel moisture that is higher than expected.
+x2 <- weights.df[weights.df$Sample == 7,]
+x1[order(x1$time),]
+x2[order(x2$time),]
 
 ###############################################################################################################################
 #################################################     PONDEROSA PINE       ####################################################
@@ -339,9 +471,9 @@ PP
 #Manually enter each of the sample numbers, 17-32, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 32
+sn <- 26
 data <- pp.fm[pp.fm$Sample == sn,]
-data.pp <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data.pp <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
 
 # Plot
@@ -351,6 +483,19 @@ sp <- data %>%
   geom_point(aes(fill=data.pp),size=3) +
   geom_line(aes(group = location),color="black")
 sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+#Sample 26
+#Flags
+#Details - the 12m location for the 48-hr scan has a gross weight/fuel moisture that is higher than expected.
+x1 <- data[data$scan == "36.0",]
+x2 <- data[data$scan == "48.0",]
+x3 <- data[data$scan == "120.0",]
+x4 <- data[data$scan == "od",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+x4[order(x4$time),]
 
 ###############################################################################################################################
 #################################################     SOUTHERN RED OAK    #####################################################
@@ -406,7 +551,7 @@ SRO
 #Manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 6
+sn <- 16
 data <- sro.fm[sro.fm$Sample == sn,]
 data.sro <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
@@ -418,6 +563,62 @@ sp <- data %>%
   geom_point(aes(fill=data.sro),size=3) +
   geom_line(aes(group = location),color="black")
 sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
+
+#Sample 6
+#Flags
+#Details - the 3m location for the 2-hr scan has a gross weight/fuel moisture that is higher than expected.
+x1 <- data[data$scan == "1.0",]
+x2 <- data[data$scan == "2.0",]
+x3 <- data[data$scan == "4.0",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Sample 13
+#Flags
+#Details - the 3m location for the 8-hr scan has a gross weight/fuel moisture that is higher than expected.
+x1 <- data[data$scan == "4.0",]
+x2 <- data[data$scan == "8.0",]
+x3 <- data[data$scan == "12.0",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Sample 14
+#Flags
+#Details - the gross weight and fuel moisture at 3m location for the oven-dry scan is lower than expected.
+x1 <- data[data$scan == "24.0",]
+x2 <- data[data$scan == "36.0",]
+x3 <- data[data$scan == "od",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Sample 15
+#Flags
+#Details - the gross weight and fuel moisture at 3m location for the 8-hr scan is lower than expected.
+x1 <- data[data$scan == "4.0",]
+x2 <- data[data$scan == "8.0",]
+x3 <- data[data$scan == "12.0",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Sample 15
+#Flags
+#Details - the gross weight and fuel moisture at 3m location for the oven-dry scan is lower than expected.
+x1 <- data[data$scan == "24.0",]
+x2 <- data[data$scan == "36.0",]
+x3 <- data[data$scan == "od",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
 
 ###############################################################################################################################
 #################################################     LONGLEAF PINE    ########################################################
@@ -469,9 +670,9 @@ LLP
 #Manually enter each of the sample numbers, 17-32, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 32
+sn <- 30
 data <- llp.fm[llp.fm$Sample == sn,]
-data.llp <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "OD"))
+data.llp <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
 
 # Plot
@@ -482,8 +683,50 @@ sp <- data %>%
   geom_line(aes(group = location),color="black")
 sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
 
-llp.fm[llp.fm$scan == "48.0",]
-str(data)
+
+#Samples 17-32
+#Flags
+#Details - the 3m location for the 48-hr scan is missing weight.
+x1 <- data[data$scan == "36.0",]
+x2 <- data[data$scan == "48.0",]
+x3 <- data[data$scan == "od",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Samples 21
+#Flags
+#Details - the 3m location for the oven-dry scan is lower than expected.
+x1 <- data[data$scan == "36.0",]
+x2 <- data[data$scan == "48.0",]
+x3 <- data[data$scan == "od",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Samples 30
+#Flags
+#Details - the 9m location for the oven-dry scan is lower than expected.
+x1 <- data[data$scan == "36.0",]
+x2 <- data[data$scan == "48.0",]
+x3 <- data[data$scan == "od",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
+
+#Samples 30
+#Flags
+#Details - the 9m location for the oven-dry scan is lower than expected.
+x1 <- data[data$scan == "4.0",]
+x2 <- data[data$scan == "8.0",]
+x3 <- data[data$scan == "12.0",]
+
+x1[order(x1$time),]
+x2[order(x2$time),]
+x3[order(x3$time),]
 
 
 ############
