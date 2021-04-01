@@ -334,8 +334,7 @@ weights.df <- inner_join(weights.df, dry.df, by = "Sample")
 
 #calculates fuel moistures
 df.fm <- weights.df %>%
-  mutate(fm =((net.wt-dry.wt)*100/dry.wt)) %>%
-  filter(fm>0) 
+  mutate(fm =((net.wt-dry.wt)*100/dry.wt)) 
 
 #df sample name/number/scan/angle
 df.fm2 <- df.fm %>%
