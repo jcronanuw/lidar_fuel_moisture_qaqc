@@ -64,31 +64,10 @@ tare <- read_excel("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/G
 tare <- write_csv(tare, "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/drying_trays.csv")
 tare <- read.csv("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/drying_trays.csv")
 
-#Dry Weights
-#Copy link to file into an object
-target <- drive_get("https://docs.google.com/spreadsheets/d/1QJgsKv3ArD5V7lIuMS77XX83NShDouah/edit#gid=698536073", 
-                    team_drive = "2021 Lidar fuel moisture")
-
-#Download a copy of the fuel moisture file
-drive_download(target, 
-               type = "xlsx", 
-               path = "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/dry_weights.xlsx", 
-               overwrite = T)
-
-#load data
-dry.wts <- read_excel("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/dry_weights.xlsx")
-dry.wts <- write_csv(dry.wts, "C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/dry_weights.csv")
-dry.wts <- read.csv("C:/Users/jcronan/Documents/GitHub/lidar_fuel_moisture_qaqc/GoogleDrive_TempDownloads/dry_weights.csv")
-
 ###############################################################################################################################
 #################################################     PINE BOARDS          ####################################################
 ###############################################################################################################################
 weights.pb <- filter(weights, sample.type=="PB")
-
-#dry.p <- dry.wts %>%
-# filter(Sample.Type == "PB") %>%
-#  rename(dry.wt = "Dry.Weight", Sample = "Sample.Number") %>%
-#  select(Sample, dry.wt)
 
 #adds dry weights from earliest set of oven dry scans
 dry.p <- weights.pb %>%
@@ -129,7 +108,7 @@ PB
 #Manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 1
+sn <- 8
 data <- pb.fm[pb.fm$Sample == sn,]
 data.pb <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
@@ -180,6 +159,26 @@ x2[order(x2$time),]
 x3[order(x3$time),]
 x4[order(x4$time),]
 
+#Check the number of weights in weight and fuel moisture tables.
+#The number should equal the number of scans times 64 (16 samples x 4 scan locations)
+check.weights.pb <- vector()
+if(length(weights.pb[,1]) == length(unique(weights.pb$scan)) * 64)
+  check.weights.pb <- "OKAY" else
+    check.weights.pb <- "ERROR"
+check.weights.pb
+
+check.fm.pb <- vector()
+if(length(pb.fm[,1]) == length(unique(pb.fm$scan)) * 64)
+  check.fm.pb <- "OKAY" else
+    check.fm.pb <- "ERROR"
+pb.ex.w <- length(unique(weights.pb$scan)) * 64
+pb.ac.w <- length(weights.pb[,1])
+pb.ex.m <- length(unique(pb.fm$scan)) * 64
+pb.ac.m <- length(pb.fm[,1])
+pb.rep <- data.frame(Item = c("Weights-Expected", "Weights-Actual", "Result", "FM-Expected", "FM-Actual", "Result"),
+                     Value = c(pb.ex.w, pb.ac.w, check.weights.pb, pb.ex.m, pb.ac.m, check.fm.pb))
+pb.rep
+
 ###############################################################################################################################
 #################################################     CHEESE CLOTH         ####################################################
 ###############################################################################################################################
@@ -195,11 +194,6 @@ weights.cc <- inner_join(weights.cc, tare.cc, by = "Sample")
 
 weights.cc$net.wt <- weights.cc$gross.weight - weights.cc$tare.staple
 
-#dry.cc <- dry.wts %>%
-# filter(Sample.Type=="CC") %>%
-#  rename(dry.wt="Dry.Weight", Sample="Sample.Number")%>%
-# select(Sample, dry.wt)
-
 #adds dry weights from earliest set of oven dry scans
 dry.cc <- weights.cc %>%
   filter(scan=="od" & time == "842") %>%
@@ -209,8 +203,7 @@ dry.cc <- weights.cc %>%
 
 weights.ccd <- inner_join(weights.cc, dry.cc, by = "Sample")
 
-cc.fm <- weights.ccd %>%
-  mutate(fm = ((net.wt-dry.wt)*100/dry.wt))
+cc.fm <- weights.ccd %>% mutate(fm = ((net.wt-dry.wt)*100/dry.wt))
 
 #df sample name/number/scan/angle
 cc.fm2 <- cc.fm %>%
@@ -239,10 +232,12 @@ CC
 #manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 10
+sn <- 12
 data <- cc.fm[cc.fm$Sample == sn,]
 data.cc <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
+x2 <- data[data$scan == "36.0",]
+x2[order(x2$time),]
 
 # Plot
 #"fm" | "gross.weight"
@@ -256,12 +251,16 @@ sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
 #Flags
 #Details - sample weights do not fall into expected order for the 8-hr scan.
 #The weight for the 12-meter location is less than would be expected and is probably incorrect.
-x1 <- data[data$scan == "4.0",]
-x2 <- data[data$scan == "8.0",]
-x3 <- data[data$scan == "12.0",]
+x1 <- data[data$scan == "2.0",]
+x2 <- data[data$scan == "4.0",]
+x3 <- data[data$scan == "8.0",]
+x4 <- data[data$scan == "12.0",]
+x5 <- data[data$scan == "24.0",]
 x1[order(x1$time),]
 x2[order(x2$time),]
 x3[order(x3$time),]
+x4[order(x4$time),]
+x5[order(x5$time),]
 
 #Sample 7
 #Flags
@@ -301,6 +300,25 @@ x3[order(x3$time),]
 x4[order(x4$time),]
 x5[order(x5$time),]
 
+#Check the number of weights in weight and fuel moisture tables.
+#The number should equal the number of scans times 64 (16 samples x 4 scan locations)
+check.weights.cc <- vector()
+if(length(weights.cc[,1]) == length(unique(weights.cc$scan)) * 64)
+  check.weights.cc <- "OKAY" else
+    check.weights.cc <- "ERROR"
+check.weights.cc
+
+check.fm.cc <- vector()
+if(length(cc.fm[,1]) == length(unique(cc.fm$scan)) * 64)
+  check.fm.cc <- "OKAY" else
+    check.fm.cc <- "ERROR"
+cc.ex.w <- length(unique(weights.cc$scan)) * 64
+cc.ac.w <- length(weights.cc[,1])
+cc.ex.m <- length(unique(cc.fm$scan)) * 64
+cc.ac.m <- length(cc.fm[,1])
+cc.rep <- data.frame(Item = c("Weights-Expected", "Weights-Actual", "Result", "FM-Expected", "FM-Actual", "Result"),
+                     Value = c(cc.ex.w, cc.ac.w, check.weights.cc, cc.ex.m, cc.ac.m, check.fm.cc))
+cc.rep
 
 ###############################################################################################################################
 #################################################     DOUGLAS-FIR          ####################################################
@@ -316,12 +334,6 @@ weights.df <- inner_join(weights.df, tare.df, by = "Sample")
 #calculates net wt of each sample by subtracting tare wt (= tray weight)
 weights.df$net.wt <- weights.df$gross.weight-weights.df$tare.wt
 
-#creates table of dry weights for each sample
-#dry.df <- dry.wts %>%
-#  filter(Sample.Type=="DF") %>%
-#  rename(dry.wt="Dry.Weight", Sample="Sample.Number")%>%
-#  select(Sample, dry.wt)
-
 #adds dry weights from earliest set of oven dry scans
 dry.df <- weights.df %>%
   filter(scan=="od" & time == "1015") %>%
@@ -333,9 +345,7 @@ dry.df <- weights.df %>%
 weights.df <- inner_join(weights.df, dry.df, by = "Sample")
 
 #calculates fuel moistures
-df.fm <- weights.df %>%
-  mutate(fm =((net.wt-dry.wt)*100/dry.wt)) %>%
-  filter(fm>0) 
+df.fm <- weights.df %>% mutate(fm =((net.wt-dry.wt)*100/dry.wt)) 
 
 #df sample name/number/scan/angle
 df.fm2 <- df.fm %>%
@@ -364,10 +374,12 @@ DF
 #Manually enter each of the sample numbers, 1-16, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 7
+sn <-2
 data <- df.fm[df.fm$Sample == sn,]
 data.df <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
+x1 <- data[data$scan == "od",]
+x1[order(x1$Sample),]
 
 # Plot
 #"fm" | "gross.weight"
@@ -421,6 +433,26 @@ x2 <- weights.df[weights.df$Sample == 7,]
 x1[order(x1$time),]
 x2[order(x2$time),]
 
+#Check the number of weights in weight and fuel moisture tables.
+#The number should equal the number of scans times 64 (16 samples x 4 scan locations)
+check.weights.df <- vector()
+if(length(weights.df[,1]) == length(unique(weights.df$scan)) * 64)
+  check.weights.df <- "OKAY" else
+    check.weights.df <- "ERROR"
+check.weights.df
+
+check.fm.df <- vector()
+if(length(df.fm[,1]) == length(unique(df.fm$scan)) * 64)
+  check.fm.df <- "OKAY" else
+    check.fm.df <- "ERROR"
+df.ex.w <- length(unique(weights.df$scan)) * 64
+df.ac.w <- length(weights.df[,1])
+df.ex.m <- length(unique(df.fm$scan)) * 64
+df.ac.m <- length(df.fm[,1])
+df.rep <- data.frame(Item = c("Weights-Expected", "Weights-Actual", "Result", "FM-Expected", "FM-Actual", "Result"),
+                     Value = c(df.ex.w, df.ac.w, check.weights.df, df.ex.m, df.ac.m, check.fm.df))
+df.rep
+
 ###############################################################################################################################
 #################################################     PONDEROSA PINE       ####################################################
 ###############################################################################################################################
@@ -440,8 +472,7 @@ dry.pp <- weights.pp %>%
 
 weights.pp <- inner_join(weights.pp, dry.pp, by = "Sample")
 
-pp.fm <- weights.pp %>%
-  mutate(fm =((net.wt-dry.wt)*100/dry.wt)) 
+pp.fm <- weights.pp %>% mutate(fm =((net.wt-dry.wt)*100/dry.wt)) 
 
 #df sample name/number/scan/angle
 pp.fm2 <- pp.fm %>%
@@ -471,10 +502,12 @@ PP
 #Manually enter each of the sample numbers, 17-32, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 26
+sn <- 28
 data <- pp.fm[pp.fm$Sample == sn,]
 data.pp <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
+x1 <- data[data$scan == "48.0",]
+x1[order(x1$time),]
 
 # Plot
 #"fm" | "gross.weight"
@@ -496,6 +529,39 @@ x1[order(x1$time),]
 x2[order(x2$time),]
 x3[order(x3$time),]
 x4[order(x4$time),]
+
+#Check the number of weights in weight and fuel moisture tables.
+#The number should equal the number of scans times 64 (16 samples x 4 scan locations)
+check.weights.pp <- vector()
+if(length(weights.pp[,1]) == length(unique(weights.pp$scan)) * 64)
+  check.weights.pp <- "OKAY" else
+    check.weights.pp <- "ERROR"
+check.weights.pp
+
+check.fm.pp <- vector()
+if(length(pp.fm[,1]) == length(unique(pp.fm$scan)) * 64)
+  check.fm.pp <- "OKAY" else
+    check.fm.pp <- "ERROR"
+pp.ex.w <- length(unique(weights.pp$scan)) * 64
+pp.ac.w <- length(weights.pp[,1])
+pp.ex.m <- length(unique(pp.fm$scan)) * 64
+pp.ac.m <- length(pp.fm[,1])
+pp.rep <- data.frame(Item = c("Weights-Expected", "Weights-Actual", "Result", "FM-Expected", "FM-Actual", "Result"),
+                     Value = c(pp.ex.w, pp.ac.w, check.weights.pp, pp.ex.m, pp.ac.m, check.fm.pp))
+pp.rep
+#There are 705 samples and there should be 704. Where is the extra sample weight?
+sns <- 17:32
+check <- vector()
+for(i in 1:16)
+  {
+  check[i] <- length(weights.pp[,1][weights.pp$Sample == sns[i]])
+}
+check
+#sample 24 has the extra value.
+weights.pp[weights.pp$Sample == 24,]
+#There are 2 rows for the 6 meter location in the 2-hr scan. They both have the same exact values
+#One row was deleted from the source data.
+
 
 ###############################################################################################################################
 #################################################     SOUTHERN RED OAK    #####################################################
@@ -521,8 +587,7 @@ dry.sro <- weights.sro %>%
 weights.sro <- inner_join(weights.sro, dry.sro, by = "Sample")
 
 #calculates fuel moisture
-sro.fm <- weights.sro %>%
-  mutate(fm =((net.wt-dry.wt)*100/dry.wt))
+sro.fm <- weights.sro %>% mutate(fm =((net.wt-dry.wt)*100/dry.wt))
 
 #df sample name/number/scan/angle
 sro.fm2 <- sro.fm %>%
@@ -555,6 +620,8 @@ sn <- 16
 data <- sro.fm[sro.fm$Sample == sn,]
 data.sro <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
+x1 <- data[data$scan == "od",]
+x1[order(x1$time),]
 
 # Plot
 #"fm" | "gross.weight"
@@ -567,9 +634,9 @@ sp + scale_color_manual(values=c("green", "blue", "orange", "purple"))
 #Sample 6
 #Flags
 #Details - the 3m location for the 2-hr scan has a gross weight/fuel moisture that is higher than expected.
-x1 <- data[data$scan == "1.0",]
-x2 <- data[data$scan == "2.0",]
-x3 <- data[data$scan == "4.0",]
+x1 <- data[data$scan == "12.0",]
+x2 <- data[data$scan == "24.0",]
+x3 <- data[data$scan == "36.0",]
 
 x1[order(x1$time),]
 x2[order(x2$time),]
@@ -581,7 +648,6 @@ x3[order(x3$time),]
 x1 <- data[data$scan == "4.0",]
 x2 <- data[data$scan == "8.0",]
 x3 <- data[data$scan == "12.0",]
-
 x1[order(x1$time),]
 x2[order(x2$time),]
 x3[order(x3$time),]
@@ -619,6 +685,25 @@ x1[order(x1$time),]
 x2[order(x2$time),]
 x3[order(x3$time),]
 
+#Check the number of weights in weight and fuel moisture tables.
+#The number should equal the number of scans times 64 (16 samples x 4 scan locations)
+check.weights.sro <- vector()
+if(length(weights.sro[,1]) == length(unique(weights.sro$scan)) * 64)
+  check.weights.sro <- "OKAY" else
+    check.weights.sro <- "ERROR"
+check.weights.sro
+
+check.fm.sro <- vector()
+if(length(sro.fm[,1]) == length(unique(sro.fm$scan)) * 64)
+  check.fm.sro <- "OKAY" else
+    check.fm.sro <- "ERROR"
+sro.ex.w <- length(unique(weights.sro$scan)) * 64
+sro.ac.w <- length(weights.sro[,1])
+sro.ex.m <- length(unique(sro.fm$scan)) * 64
+sro.ac.m <- length(sro.fm[,1])
+sro.rep <- data.frame(Item = c("Weights-Expected", "Weights-Actual", "Result", "FM-Expected", "FM-Actual", "Result"),
+                     Value = c(sro.ex.w, sro.ac.w, check.weights.sro, sro.ex.m, sro.ac.m, check.fm.sro))
+sro.rep
 
 ###############################################################################################################################
 #################################################     LONGLEAF PINE    ########################################################
@@ -639,8 +724,7 @@ weights.llp <- inner_join(weights.llp, dry.llp, by = "Sample")
 weights.llp$net.wt <- weights.llp$gross.weight-weights.llp$tare.wt
 
 #calculate fuel moisture
-llp.fm <- weights.llp %>%
-  mutate(fm =((net.wt-dry.wt)*100/dry.wt))
+llp.fm <- weights.llp %>% mutate(fm =((net.wt-dry.wt)*100/dry.wt))
 
 #df sample name/number/scan/angle
 llp.fm2 <- llp.fm %>%
@@ -670,10 +754,12 @@ LLP
 #Manually enter each of the sample numbers, 17-32, and review graphs. Lines should be mostly parallel
 #Run review for gross weight and fuel moisture.
 
-sn <- 30
+sn <- 32
 data <- llp.fm[llp.fm$Sample == sn,]
 data.llp <- factor(data$scan, ordered = T, levels = c("0.0", "1.0", "2.0", "4.0", "8.0", "12.0", "24.0", "36.0", "48.0", "72.0", "120.0", "od"))
 data$location <- as.factor(data$location)
+x1 <- data[data$scan == "48.0",]
+x1[order(x1$time),]
 
 # Plot
 #"fm" | "gross.weight"
@@ -728,6 +814,30 @@ x1[order(x1$time),]
 x2[order(x2$time),]
 x3[order(x3$time),]
 
+#Check the number of weights in weight and fuel moisture tables.
+#The number should equal the number of scans times 64 (16 samples x 4 scan locations)
+check.weights.llp <- vector()
+if(length(weights.llp[,1]) == length(unique(weights.llp$scan)) * 64)
+  check.weights.llp <- "OKAY" else
+    check.weights.llp <- "ERROR"
+check.weights.llp
+
+check.fm.llp <- vector()
+if(length(llp.fm[,1]) == length(unique(llp.fm$scan)) * 64)
+  check.fm.llp <- "OKAY" else
+    check.fm.llp <- "ERROR"
+llp.ex.w <- length(unique(weights.llp$scan)) * 64
+llp.ac.w <- length(weights.llp[,1])
+llp.ex.m <- length(unique(llp.fm$scan)) * 64
+llp.ac.m <- length(llp.fm[,1])
+llp.rep <- data.frame(Item = c("Weights-Expected", "Weights-Actual", "Result", "FM-Expected", "FM-Actual", "Result"),
+                      Value = c(llp.ex.w, llp.ac.w, check.weights.llp, llp.ex.m, llp.ac.m, check.fm.llp))
+llp.rep
+
+############################################################################################################################
+############################################################################################################################
+############################################################################################################################
+
 
 ############
 #create df of all sample names and fuel moistures
@@ -740,6 +850,9 @@ library("gridExtra")
 all <- grid.arrange (PB, CC, DF, PP, SRO, LLP, nrow = 3)
 
 ggsave(all, filename = "G:/Shared drives/2021 Lidar fuel moisture/Data_results/FM.Plots.pdf", device = "pdf", width = 7.7, height = 8, dpi = 300)
+
+
+
 
 ###################################################################################################################################################
 ###################################################################################################################################################
